@@ -4,7 +4,7 @@ import bgImage from "../assets/zomato.avif";
 import axios from "axios";
 const baseUrl = "http://localhost:5000";
 
-const LoginPopup = () => {
+const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,7 +28,14 @@ const LoginPopup = () => {
     console.log(res.data, "user logged in");
     localStorage.setItem("token",res.data.token)
     if (res.data.user.role === "restaurant") {
-      navigate("/restaurant-dashboard");
+      navigate("/restaurant/dashboard");
+    } 
+    else if (res.data.user.role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (res.data.user.role === "user") {
+      navigate("/home");
+    } else if (res.data.user.role === "delivery-boy") {
+      navigate("/delivery-boy/dashboard");
     } else {
       navigate("/");
     }
@@ -98,4 +105,4 @@ const LoginPopup = () => {
   );
 };
 
-export default LoginPopup;
+export default Login;

@@ -30,17 +30,17 @@ ChartJS.register(
 
 const AdminDashboard = () => {
   const token = localStorage.getItem("token");
-  const [data,setData] = useState([])
+  const [data, setData] = useState([]);
   const [activeSection, setActiveSection] = useState("dashboard");
   const [restaurantFilter, setRestaurantFilter] = useState("pending");
-  const [restaurantStatus, setRestaurantStatus] = useState({
-    "Spicy Treat": "pending",
-    "Food Fusion": "pending",
-    "Tandoori Hub": "active",
-    "Urban Bites": "active",
-    "Old Kitchen": "removed",
-    "BBQ Delight": "removed",
-  });
+//   const [restaurantStatus, setRestaurantStatus] = useState({
+//     "Spicy Treat": "pending",
+//     "Food Fusion": "pending",
+//     "Tandoori Hub": "active",
+//     "Urban Bites": "active",
+//     "Old Kitchen": "removed",
+//     "BBQ Delight": "removed",
+//   });
 
   const [darkMode, setDarkMode] = useState(false);
 
@@ -63,66 +63,63 @@ const AdminDashboard = () => {
         }
       );
 
-      console.log(res.data); 
-      setRestaurantFilter(status)// optional: check the response
+      console.log(res.data);
+      setRestaurantFilter(status); // optional: check the response
     } catch (error) {
       console.error("Status update failed:", error);
     }
   };
 
-   useEffect(() => {
-     const fetchData = async () => {
-       try {
-         const res = await axios.get("http://localhost:5000/users/", {
-           headers: {
-             Authorization: `Bearer ${token}`,
-           },
-         });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/users/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         //  console.log(res.data, "dddd");
-         setData(res.data); // assuming you're storing the response
-       } catch (error) {
-         console.error("Error fetching data:", error.message);
-       }
-     };
+        setData(res.data); // assuming you're storing the response
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
 
-     fetchData();
-   }, [restaurantFilter]);
+    fetchData();
+  }, [restaurantFilter]);
 
-   const allRestaurant = data.filter((item) => {
-     return item.role === "restaurant"; 
-   });
+  const allRestaurant = data.filter((item) => {
+    return item.role === "restaurant";
+  });
 
   //  console.log(allRestaurant, "allRestaurant");
 
+  const filtered = allRestaurant.filter(
+    (r) => restaurantFilter === "all" || r.status === restaurantFilter
+  );
+  // console.log(filtered, "fill");
 
-    const filtered = allRestaurant.filter(
-      (r) =>
-        restaurantFilter === "all" ||
-        r.status === restaurantFilter
-    );
-    // console.log(filtered, "fill");
+  const dataCount = data.reduce((acc, item) => {
+    acc[item.role] = (acc[item.role] || 0) + 1;
+    return acc;
+  }, {});
+  const roleCount = Object.entries(dataCount).map((item) => ({
+    role: item[0],
+    count: item[1],
+  }));
 
-    const dataCount = data.reduce((acc,item)=>{
-      acc[item.role] = (acc[item.role]||0)+1
-      return acc
-    },{})
-    const roleCount = Object.entries(dataCount).map((item)=>({
-      role:item[0],
-      count:item[1]
-    }))
+  console.log(dataCount);
+  console.log(roleCount);
 
-    console.log(dataCount)
-    console.log(roleCount)
-
-  const restaurantDetails = [
-    { name: "Spicy Treat", owner: "Ravi Sharma", address: "Delhi" },
-    { name: "Food Fusion", owner: "Anita Kapoor", address: "Mumbai" },
-    { name: "Tandoori Hub", owner: "Aman Verma", address: "Lucknow" },
-    { name: "Urban Bites", owner: "Neha Singh", address: "Bangalore" },
-    { name: "Old Kitchen", owner: "Rohit Das", address: "Chennai" },
-    { name: "BBQ Delight", owner: "Karan Thakur", address: "Hyderabad" },
-  ];
+//   const restaurantDetails = [
+//     { name: "Spicy Treat", owner: "Ravi Sharma", address: "Delhi" },
+//     { name: "Food Fusion", owner: "Anita Kapoor", address: "Mumbai" },
+//     { name: "Tandoori Hub", owner: "Aman Verma", address: "Lucknow" },
+//     { name: "Urban Bites", owner: "Neha Singh", address: "Bangalore" },
+//     { name: "Old Kitchen", owner: "Rohit Das", address: "Chennai" },
+//     { name: "BBQ Delight", owner: "Karan Thakur", address: "Hyderabad" },
+//   ];
 
   const renderDashboard = () => (
     <div className="w-full space-y-8">
@@ -255,9 +252,6 @@ const AdminDashboard = () => {
   );
 
   const renderRestaurants = () => {
-   
-
-
     return (
       <div className="w-full">
         <div className="flex justify-between items-center mb-6">
@@ -370,7 +364,9 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <div className="w-64 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col">
-        <h1 className="text-2xl font-bold mb-10 text-purple-700">Zomato Admin</h1>
+        <h1 className="text-2xl font-bold mb-10 text-purple-700">
+          Zomato Admin
+        </h1>
         <div className="flex flex-col gap-6 text-lg">
           <button
             onClick={() => setActiveSection("dashboard")}

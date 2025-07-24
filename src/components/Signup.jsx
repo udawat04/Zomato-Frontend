@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 const baseUrl = "http://localhost:5000";
 
-const SignupPopup = () => {
+const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -64,9 +64,11 @@ const SignupPopup = () => {
         {/* Close Button */}
         <button
           className="absolute top-2 right-3 text-xl font-bold"
-          onClick={() => {role === "restaurant"
-            ? navigate("/restaurant-dashboard")
-            : navigate("/");}}
+          onClick={() => {
+            role === "restaurant"
+              ? navigate("/restaurant/welcome")
+              : navigate("/");
+          }}
         >
           ×
         </button>
@@ -176,4 +178,4 @@ const SignupPopup = () => {
   );
 };
 
-export default SignupPopup;
+export default Signup;

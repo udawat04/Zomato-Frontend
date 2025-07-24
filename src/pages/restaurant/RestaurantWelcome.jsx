@@ -1,8 +1,9 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import restImage from "../assets/rest1.jpg"; // Make sure this image exists
+import restImage from "../../assets/rest1.jpg"; // Make sure this image exists
 
-const RestaurantDashboard = () => {
+const RestaurantWelcome = () => {
   const navigate = useNavigate();
 
   const handleRegisterClick = () => {
@@ -40,4 +41,4 @@ const RestaurantDashboard = () => {
   );
 };
 
-export default RestaurantDashboard;
+export default RestaurantWelcome;
