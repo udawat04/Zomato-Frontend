@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bgImage from "../assets/zomato.avif";
 import axios from "axios";
+import { toast } from "react-toastify";
 const baseUrl = "http://localhost:5000";
 
 const Login = () => {
@@ -20,26 +21,71 @@ const Login = () => {
     });
   };
 
-  const handleLogin = async () => {
-    if (!formData.email || !formData.password) return;
-    const res = await axios.post(`${baseUrl}/users/login`, {
-      ...formData,
-    });
-    console.log(res.data, "user logged in");
-    localStorage.setItem("token",res.data.token)
-    if (res.data.user.role === "restaurant") {
-      navigate("/restaurant/dashboard");
-    } 
-    else if (res.data.user.role === "admin") {
-      navigate("/admin/dashboard");
-    } else if (res.data.user.role === "user") {
-      navigate("/home");
-    } else if (res.data.user.role === "delivery-boy") {
-      navigate("/delivery-boy/dashboard");
-    } else {
-      navigate("/");
-    }
-  };
+ const handleLogin = async () => {
+   try {
+     if (!formData.email || !formData.password) {
+       toast.error("Please enter email and password");
+       return;
+     }
+
+     const res = await axios.post(`${baseUrl}/users/login`, formData);
+     const { user, token } = res.data;
+
+     console.log("User logged in:", user);
+     localStorage.setItem("token", token);
+
+     const showToastAndNavigate = (message, path) => {
+       toast.success(message);
+       navigate(path);
+     };
+
+     if (user.role === "restaurant") {
+       switch (user.status) {
+         case "pending":
+           toast.error("Your request is pending.");
+           navigate("/pending");
+           break;
+         case "rejected":
+           toast.error("Your request is rejected.");
+           navigate("/rejected");
+           break;
+         case "active":
+           showToastAndNavigate("Login successful!", "/restaurant/dashboard");
+           break;
+         default:
+           toast.error("Invalid restaurant status");
+       }
+     } else if (user.role === "admin") {
+       showToastAndNavigate("Login successful!", "/admin/dashboard");
+     } else if (user.role === "user") {
+       showToastAndNavigate("Login successful!", "/home");
+     } else if (user.role === "delivery-boy") {
+      switch (user.status) {
+        case "pending":
+          toast.error("Your request is pending.");
+          navigate("/pending");
+          break;
+        case "rejected":
+          toast.error("Your request is rejected.");
+          navigate("/rejected");
+          break;
+        case "active":
+          showToastAndNavigate("Login successful!", "/delivery-boy/dashboard");
+          break;
+        default:
+          toast.error("Invalid restaurant status");
+      }
+       
+     } else {
+       navigate("/");
+     }
+   } catch (error) {
+     console.error("Login failed:", error);
+     const errMsg = error.response?.data?.message || "Login failed. Try again.";
+     toast.error(errMsg);
+   }
+ };
+
 
   return (
     <div className="fixed inset-0 z-50">

@@ -1,7 +1,13 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import zomato from "../../assets/zomato.avif";
+import WhyChooseUs from "../../components/WhyChooseUs";
+import CategorySlider from "../../components/CategorySlider";
+import TopBrandsSlider from "../../components/TopBrandSlider";
+import RestaurantCard from "../../components/RestaurantCard";
+import Header from "../../components/Header";
+import Navbar from "../../components/Navbar";
+import Banner from "../../components/Banner";
+import Footer from "../../components/Footer";
 
 const popularFoods = [
   { name: "Margherita Pizza", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" },
@@ -19,37 +25,28 @@ const featuredRestaurants = [
 ];
 
 const UserHomePage = () => {
-  const navigate = useNavigate();
+ 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[#ffffff] flex flex-col">
       {/* Hero with background image and overlay */}
-      <div
-        className="relative h-72 md:h-96 bg-cover bg-center"
-        style={{ backgroundImage: `url(${zomato})` }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-        <div className="relative flex flex-col justify-center items-center h-full text-center px-6">
-          <h1 className="text-white text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">
-            Discover the best food & restaurants in India
-          </h1>
-          <button
-            onClick={() => navigate("/home")}
-            className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition"
-          >
-            Explore Food
-          </button>
-        </div>
-      </div>
+
+      <Header />
+      <Navbar />
+      <Banner />
+
+      <CategorySlider />
+
+      <TopBrandsSlider />
 
       {/* Content section */}
       <div className="flex-1 overflow-auto p-6 max-w-7xl mx-auto">
         {/* Popular Foods */}
-        <section className="mb-12">
+        <section className="mb-12 w-full">
           <h2 className="text-3xl font-bold mb-6 text-gray-800">
             Popular Foods
           </h2>
-          <div className="flex gap-6 overflow-x-auto no-scrollbar pb-3">
+          <div className="flex w-full gap-6 overflow-hidden no-scrollbar  pb-3">
             {popularFoods.map((food) => (
               <div
                 key={food.name}
@@ -104,12 +101,17 @@ const UserHomePage = () => {
             ))}
           </div>
         </section>
+
+        <section className="mt-10">
+          <RestaurantCard />
+        </section>
+
+        <section>
+          <WhyChooseUs />
+        </section>
       </div>
 
-      {/* Footer */}
-      <footer className="text-center text-gray-400 text-xs font-light py-4 select-none">
-        © {new Date().getFullYear()} Zomato Replica. For demo purposes only.
-      </footer>
+    <Footer/>
     </div>
   );
 };
