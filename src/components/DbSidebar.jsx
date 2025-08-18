@@ -3,31 +3,26 @@ import {
   FaUtensils,
   FaListAlt,
   FaClipboardList,
-  FaStar,
-  FaCog,
   FaBars,
-  FaUserCircle,
   FaSignOutAlt,
-  FaEdit,
 } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { NavLink, useNavigate } from "react-router-dom";
 
-export default function RestSidebar() {
+export default function DbSidebar() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
-  const navigate = useNavigate()
 
-   const handleLogout = async () => {
-    console.log("logged")
-     localStorage.removeItem("user");
-     localStorage.removeItem("token");
-     navigate("/login");
-   };
+  const handleLogout = async () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <div
-      className={` h-screen bg-white shadow-lg flex flex-col justify-between
-      ${isOpen ? "w-64" : "w-20"} transition-all duration-300 p-4 `}
+      className={`h-screen bg-white shadow-lg flex flex-col justify-between
+      ${isOpen ? "w-64" : "w-20"} transition-all duration-300 p-4`}
     >
       <div>
         {/* Toggle button */}
@@ -46,7 +41,7 @@ export default function RestSidebar() {
               isOpen ? "" : "text-lg text-center"
             }`}
           >
-            Go{" "}
+            Go
             {!isOpen && (
               <span className="text-2xl font-bold text-gray-800 ml-1 transition-all duration-300">
                 Meal
@@ -63,70 +58,53 @@ export default function RestSidebar() {
         {/* Navigation */}
         <nav className="space-y-4">
           <SidebarNavLink
-            to="/restaurant/dashboard"
+            to="/delivery-boy/dashboard"
             icon={<MdDashboard size={22} />}
             text="Dashboard"
             isOpen={isOpen}
           />
           <SidebarNavLink
-            to="/restaurant/menu"
+            to="/delivery-boy/update"
             icon={<FaUtensils size={20} />}
-            text="Menu"
+            text="Edit Profile"
             isOpen={isOpen}
           />
-          <SidebarNavLink
-            to="/restaurant/add/food-item"
+          {/* <SidebarNavLink
+            to="/user/add-address"
             icon={<FaClipboardList size={20} />}
-            text="Add Food Item"
+            text="Add Address"
             isOpen={isOpen}
           />
           <SidebarNavLink
-            to="/restaurant/today-order"
+            to="/user/order-history"
             icon={<FaListAlt size={20} />}
-            text="Today Order"
+            text="Order History"
             isOpen={isOpen}
           />
           <SidebarNavLink
-            to="/restaurant/total-revenue"
-            icon={<FaCog size={20} />}
-            text="Total Revenue"
+            to="/user/current-order"
+            icon={<FaListAlt size={20} />}
+            text="Current Order"
             isOpen={isOpen}
-          />
-          <SidebarNavLink
-            to="/restaurant/update"
-            icon={<FaEdit size={20} />}
-            text="Edit-Restaurant"
-            isOpen={isOpen}
-          />
+          /> */}
         </nav>
       </div>
 
-      {/* Profile and Logout section */}
+      {/* Logout */}
       <div className="space-y-3">
         <SidebarNavLink
-          to="/profile"
-          icon={<FaUserCircle size={20} />}
-          text="Profile"
+          onClick={handleLogout}
+          icon={<FaSignOutAlt size={20} />}
+          text="Logout"
           isOpen={isOpen}
+          className="text-red-600"
+          activeClassName="bg-red-500 text-white"
         />
-        <div className="space-y-3">
-          <SidebarNavLink
-            onClick={handleLogout}
-            icon={<FaSignOutAlt size={20} />}
-            text="Logout"
-            isOpen={isOpen}
-            className="text-red-600"
-            activeClassName="bg-red-500 text-white"
-          />
-        </div>
       </div>
     </div>
   );
 }
 
-/**
- * SidebarNavLink wraps NavLink from react-router-dom to handle active styling
- */
 function SidebarNavLink({
   to,
   onClick,

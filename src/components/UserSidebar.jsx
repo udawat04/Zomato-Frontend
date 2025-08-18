@@ -81,6 +81,12 @@ export default function UserSidebar() {
             text="Order History"
             isOpen={isOpen}
           />
+          <SidebarNavLink
+            to="/user/current-order"
+            icon={<FaListAlt size={20} />}
+            text="Current Order"
+            isOpen={isOpen}
+          />
         </nav>
       </div>
 

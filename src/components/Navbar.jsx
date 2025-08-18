@@ -4,13 +4,13 @@ import { Link, useLocation } from "react-router-dom";
 const navItems = [
   { label: "Home", path: "/home" },
   { label: "Menu", path: "/user/menu" },
-  { label: "Offers", path: "/offers" },
-  { label: "Foods", path: "/foods" },
-  { label: "Restaurants", path: "/restaurants" },
+  { label: "Offers", path: "/user/offers" },
+  { label: "Restaurants", path: "/user/all-restaurants" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ cartNumber }) => {
   const location = useLocation();
+  console.log(cartNumber, "ysjjfknn");
 
   return (
     <nav className="px-8 py-3 flex justify-between items-center border-b border-gray-200 bg-white relative">
@@ -37,15 +37,19 @@ const Navbar = () => {
           );
         })}
       </div>
-      <div
-        className="absolute right-10 cursor-pointer"
-        onClick={() => alert(`You have ${3} items in your cart`)}
-      >
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/34/34568.png"
-          alt="cart"
-          className="w-6 h-6"
-        />
+      <div className="absolute right-10 cursor-pointer">
+        <Link to={"/user/add-cart"} className="relative">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/34/34568.png"
+            alt="cart"
+            className="w-6 h-6"
+          />
+          {cartNumber > 0 && (
+            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+              {cartNumber}
+            </span>
+          )}
+        </Link>
       </div>
     </nav>
   );

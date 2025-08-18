@@ -33,7 +33,7 @@ const UserDashboard = () => {
     name: userData.name,
     email: userData.email,
     phone: userData.phone,
-    address: userData.addresses[0],
+    address: userData.addresses[0] || "",
     joined: "Jan 15, 2024",
     image: userData.image || "https://i.pravatar.cc/300", // replace with dynamic image URL
   };

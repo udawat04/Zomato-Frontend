@@ -3,101 +3,130 @@ import { useNavigate } from "react-router-dom";
 import bgImage from "../assets/zomato.avif";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 const baseUrl = "http://localhost:5000";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+  const [coordinates, setCoordinates] = useState({
+    latitude: "",
+    longitude: "",
   });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
+  // handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
- const handleLogin = async () => {
-   try {
-     if (!formData.email || !formData.password) {
-       toast.error("Please enter email and password");
-       return;
-     }
+  // fetch coordinates
+  const getCoordinates = () =>
+    new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject("Geolocation not supported");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setCoordinates({ latitude, longitude });
+          resolve({ latitude, longitude });
+        },
+        (err) => reject(err.message)
+      );
+    });
 
-     const res = await axios.post(`${baseUrl}/users/login`, formData);
-     const { user, token } = res.data;
+  // update delivery boy location
+  const updateDeliveryBoyLocation = async (id, latitude, longitude, token) => {
+    try {
+     const res =  await axios.put(
+        `${baseUrl}/delivery-boy/update-location/${id}`,
+        { dbId: id, latitude, longitude },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log(res,"Delivery boy location updated successfully");
 
-     console.log("User logged in:", user);
-     localStorage.setItem("token", token);
+    } catch (err) {
+      console.error("Failed to update location:", err);
+    }
+  };
 
-     const showToastAndNavigate = (message, path) => {
-       toast.success(message);
-       navigate(path);
-     };
-
-     if (user.role === "restaurant") {
-       switch (user.status) {
-         case "pending":
-           toast.error("Your request is pending.");
-           navigate("/pending");
-           break;
-         case "rejected":
-           toast.error("Your request is rejected.");
-           navigate("/rejected");
-           break;
-         case "active":
-           showToastAndNavigate("Login successful!", "/restaurant/dashboard");
-           break;
-         default:
-           toast.error("Invalid restaurant status");
-       }
-     } else if (user.role === "admin") {
-       showToastAndNavigate("Login successful!", "/admin/dashboard");
-     } else if (user.role === "user") {
-       showToastAndNavigate("Login successful!", "/home");
-     } else if (user.role === "delivery-boy") {
-      switch (user.status) {
-        case "pending":
-          toast.error("Your request is pending.");
-          navigate("/pending");
-          break;
-        case "rejected":
-          toast.error("Your request is rejected.");
-          navigate("/rejected");
-          break;
-        case "active":
-          showToastAndNavigate("Login successful!", "/delivery-boy/dashboard");
-          break;
-        default:
-          toast.error("Invalid restaurant status");
+  // login
+  const handleLogin = async () => {
+    try {
+      if (!formData.email || !formData.password) {
+        toast.error("Please enter email and password");
+        return;
       }
-       
-     } else {
-       navigate("/");
-     }
-   } catch (error) {
-     console.error("Login failed:", error);
-     const errMsg = error.response?.data?.message || "Login failed. Try again.";
-     toast.error(errMsg);
-   }
- };
 
+      // get user location first
+      const { latitude, longitude } = await getCoordinates();
+
+      const res = await axios.post(`${baseUrl}/users/login`, formData);
+      const { user, token } = res.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("coordinates",coordinates)
+
+      const showToastAndNavigate = (message, path) => {
+        toast.success(message);
+        navigate(path);
+      };
+
+      if (user.role === "restaurant") {
+        if (user.status === "pending")
+          return (
+            toast.error("Your request is pending.") || navigate("/pending")
+          );
+        if (user.status === "rejected")
+          return (
+            toast.error("Your request is rejected.") || navigate("/rejected")
+          );
+        if (user.status === "active")
+          return showToastAndNavigate(
+            "Login successful!",
+            "/restaurant/dashboard"
+          );
+        toast.error("Invalid restaurant status");
+      } else if (user.role === "admin") {
+        showToastAndNavigate("Login successful!", "/admin/dashboard");
+      } else if (user.role === "user") {
+        showToastAndNavigate("Login successful!", "/home");
+      } else if (user.role === "delivery-boy") {
+        if (user.status === "pending")
+          return (
+            toast.error("Your request is pending.") || navigate("/pending")
+          );
+        if (user.status === "rejected")
+          return (
+            toast.error("Your request is rejected.") || navigate("/rejected")
+          );
+        if (user.status === "active") {
+          // update location in backend
+          await updateDeliveryBoyLocation(user.deliveryBoyId, latitude, longitude, token);
+          return showToastAndNavigate(
+            "Login successful!",
+            "/delivery-boy/dashboard"
+          );
+        }
+        toast.error("Invalid delivery-boy status");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      const errMsg =
+        error.response?.data?.message || "Login failed. Try again.";
+      toast.error(errMsg);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50">
-      {/* Background Image with Blur */}
+      {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center filter blur-sm"
-        style={{
-          backgroundImage: `url(${bgImage})`, // ✅ Make sure this image exists in public/assets/
-        }}
-      ></div>
-
-      {/* Semi-transparent Black Overlay */}
+        style={{ backgroundImage: `url(${bgImage})` }}
+      />
       <div className="absolute inset-0 bg-black bg-opacity-40"></div>
 
       {/* Centered Login Box */}
@@ -121,7 +150,7 @@ const Login = () => {
             onChange={handleChange}
           />
           <input
-            type="text"
+            type="password"
             placeholder="Password"
             name="password"
             className="w-full p-3 mb-3 border border-gray-300 rounded"
